@@ -1294,8 +1294,14 @@ static uint16_t cie_lightness(uint16_t v) {
     }
 }
 
-// range for val is [0..TIMER_TOP]. PWM pin is high while the timer count is below val.
-static inline void set_pwm(uint16_t val) { OCRxx = val; }
+// range for val is [0..TIMER_TOP]. PWM pin is active while the timer count is below val.
+static inline void set_pwm(uint16_t val) {
+#       if BACKLIGHT_ON_STATE == 0
+    OCRxx = val;
+#       else
+    OCRxx = TIMER_TOP - val;
+#       endif
+}
 
 #        ifndef BACKLIGHT_CUSTOM_DRIVER
 __attribute__((weak)) void backlight_set(uint8_t level) {
